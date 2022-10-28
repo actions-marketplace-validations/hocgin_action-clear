@@ -45,12 +45,12 @@ const main_1 = __nccwpck_require__(109);
 const { owner } = github.context.repo;
 const { repo } = github.context.repo;
 const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
-const MAX_LIMIT = 40;
+const MAX_LIMIT = 2000;
 function listAllTags(limit, maxLimit = MAX_LIMIT) {
     return __awaiter(this, void 0, void 0, function* () {
         let page = 1;
         let result = [];
-        let perPage = 40;
+        let perPage = 200;
         do {
             (0, main_1.debugPrintf)(`perPage=${perPage}, page=${page}`);
             let { data } = yield octokit.repos.listTags({
@@ -73,7 +73,7 @@ function listAllReleases(limit, maxLimit = MAX_LIMIT) {
     return __awaiter(this, void 0, void 0, function* () {
         let page = 1;
         let result = [];
-        let perPage = 40;
+        let perPage = 200;
         do {
             (0, main_1.debugPrintf)(`perPage=${perPage}, page=${page}`);
             let { data } = yield octokit.repos.listReleases({
