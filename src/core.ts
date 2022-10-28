@@ -5,10 +5,10 @@ const {owner} = github.context.repo;
 const {repo} = github.context.repo;
 const octokit = github.getOctokit(process.env.GITHUB_TOKEN!);
 
-function listAllTags(limit: number, max: number = 100) {
+function listAllTags(limit: number, max: number = 40) {
     let page = 1;
     let result: string[] = [];
-    let perPage = 100;
+    let perPage = 40;
     do {
         octokit.repos.listTags({
             owner,
@@ -20,10 +20,10 @@ function listAllTags(limit: number, max: number = 100) {
     return result.slice(Math.min(limit, result.length), Math.min(max, result.length));
 }
 
-function listAllReleases(limit: number, max: number = 100) {
+function listAllReleases(limit: number, max: number = 40) {
     let page = 1;
     let result: number[] = [];
-    let perPage = 100;
+    let perPage = 40;
     do {
         octokit.repos.listReleases({
             owner,
