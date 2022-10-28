@@ -36,10 +36,10 @@ const main_1 = __nccwpck_require__(109);
 const { owner } = github.context.repo;
 const { repo } = github.context.repo;
 const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
-function listAllTags(limit, max = 100) {
+function listAllTags(limit, max = 40) {
     let page = 1;
     let result = [];
-    let perPage = 100;
+    let perPage = 40;
     do {
         octokit.repos.listTags({
             owner,
@@ -50,10 +50,10 @@ function listAllTags(limit, max = 100) {
     } while (result.length % perPage === 0 || result.length >= max);
     return result.slice(Math.min(limit, result.length), Math.min(max, result.length));
 }
-function listAllReleases(limit, max = 100) {
+function listAllReleases(limit, max = 40) {
     let page = 1;
     let result = [];
-    let perPage = 100;
+    let perPage = 40;
     do {
         octokit.repos.listReleases({
             owner,
