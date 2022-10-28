@@ -46,8 +46,8 @@ function listAllTags(limit, max = 40) {
             repo,
             page: page++,
             per_page: perPage
-        }).then(({ data }) => result.push(...data.map(({ name }) => name)));
-    } while (result.length % perPage === 0 || result.length >= max);
+        }).then(({ data = [] }) => result.push(...data.map(({ name }) => name)));
+    } while (result.length % perPage === 0 && result.length < max);
     return result.slice(Math.min(limit, result.length), Math.min(max, result.length));
 }
 function listAllReleases(limit, max = 40) {
@@ -61,7 +61,7 @@ function listAllReleases(limit, max = 40) {
             page: page++,
             per_page: perPage
         }).then(({ data }) => result.push(...data.map(({ id }) => id)));
-    } while (result.length % perPage === 0 || result.length >= max);
+    } while (result.length % perPage === 0 && result.length < max);
     return result.slice(Math.min(limit, result.length), Math.min(max, result.length));
 }
 function run(input) {
