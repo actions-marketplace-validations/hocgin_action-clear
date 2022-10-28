@@ -36,7 +36,7 @@ const main_1 = __nccwpck_require__(109);
 const { owner } = github.context.repo;
 const { repo } = github.context.repo;
 const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
-function listAllTags(limit, max = 40) {
+function listAllTags(limit, maxLimit = 40) {
     let page = 1;
     let result = [];
     let perPage = 40;
@@ -47,10 +47,10 @@ function listAllTags(limit, max = 40) {
             page: page++,
             per_page: perPage
         }).then(({ data = [] }) => result.push(...data.map(({ name }) => name)));
-    } while (result.length % perPage === 0 && result.length < max);
-    return result.slice(Math.min(limit, result.length), Math.min(max, result.length));
+    } while (result.length < maxLimit);
+    return result.slice(Math.min(limit, result.length), Math.min(maxLimit, result.length));
 }
-function listAllReleases(limit, max = 40) {
+function listAllReleases(limit, maxLimit = 40) {
     let page = 1;
     let result = [];
     let perPage = 40;
@@ -61,8 +61,8 @@ function listAllReleases(limit, max = 40) {
             page: page++,
             per_page: perPage
         }).then(({ data }) => result.push(...data.map(({ id }) => id)));
-    } while (result.length % perPage === 0 && result.length < max);
-    return result.slice(Math.min(limit, result.length), Math.min(max, result.length));
+    } while (result.length < maxLimit);
+    return result.slice(Math.min(limit, result.length), Math.min(maxLimit, result.length));
 }
 function run(input) {
     if (input.limit_tags > 0) {
