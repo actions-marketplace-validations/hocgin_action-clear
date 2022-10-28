@@ -29,6 +29,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const github = __importStar(__nccwpck_require__(438));
@@ -38,67 +47,73 @@ const { repo } = github.context.repo;
 const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
 const MAX_LIMIT = 40;
 function listAllTags(limit, maxLimit = MAX_LIMIT) {
-    let page = 1;
-    let result = [];
-    let perPage = 40;
-    do {
-        (0, main_1.debugPrintf)(`perPage=${perPage}, page=${page}`);
-        octokit.repos.listTags({
-            owner,
-            repo,
-            page: page++,
-            per_page: perPage
-        }).then(({ data = [] }) => {
+    return __awaiter(this, void 0, void 0, function* () {
+        let page = 1;
+        let result = [];
+        let perPage = 40;
+        do {
+            (0, main_1.debugPrintf)(`perPage=${perPage}, page=${page}`);
+            let { data } = yield octokit.repos.listTags({
+                owner,
+                repo,
+                page: page++,
+                per_page: perPage
+            });
             (0, main_1.debugPrintf)('listAllTags.data', data);
             result.push(...data.map(({ name }) => name));
-        });
-    } while (result.length < maxLimit || result.length % perPage !== 0);
-    if (limit > result.length) {
-        return [];
-    }
-    return result.slice(Math.min(limit, result.length), Math.min(maxLimit, result.length));
+            // 数量满足 maxLimit，查询发现还有下一页
+        } while (result.length < maxLimit && result.length % perPage === 0);
+        if (limit > result.length) {
+            return [];
+        }
+        return result.slice(Math.min(limit, result.length), Math.min(maxLimit, result.length));
+    });
 }
 function listAllReleases(limit, maxLimit = MAX_LIMIT) {
-    let page = 1;
-    let result = [];
-    let perPage = 40;
-    do {
-        (0, main_1.debugPrintf)(`perPage=${perPage}, page=${page}`);
-        octokit.repos.listReleases({
-            owner,
-            repo,
-            page: page++,
-            per_page: perPage
-        }).then(({ data }) => {
+    return __awaiter(this, void 0, void 0, function* () {
+        let page = 1;
+        let result = [];
+        let perPage = 40;
+        do {
+            (0, main_1.debugPrintf)(`perPage=${perPage}, page=${page}`);
+            let { data } = yield octokit.repos.listReleases({
+                owner,
+                repo,
+                page: page++,
+                per_page: perPage
+            });
             (0, main_1.debugPrintf)('listReleases.data', data);
             result.push(...data.map(({ id }) => id));
-        });
-    } while (result.length < maxLimit || result.length % perPage !== 0);
-    if (limit > result.length) {
-        return [];
-    }
-    return result.slice(Math.min(limit, result.length), Math.min(maxLimit, result.length));
+            // 数量满足 maxLimit，查询发现还有下一页
+        } while (result.length < maxLimit && result.length % perPage === 0);
+        if (limit > result.length) {
+            return [];
+        }
+        return result.slice(Math.min(limit, result.length), Math.min(maxLimit, result.length));
+    });
 }
 function run(input) {
-    if (input.limit_tags > 0) {
-        (0, main_1.debugPrintf)(`正在处理 listAllTags.limit_tags`, input.limit_tags);
-        let result = listAllTags(input.limit_tags);
-        (0, main_1.debugPrintf)(`正在处理 listAllTags.size`, result.length);
-        result.forEach((name) => {
-            (0, main_1.debugPrintf)(`删除 tag.name=${name}`);
-            octokit.git.deleteRef({ owner, repo, ref: `tags/${name}` });
-        });
-    }
-    if (input.limit_release > 0) {
-        (0, main_1.debugPrintf)(`正在处理 listAllReleases.limit_release`, input.limit_release);
-        let result = listAllReleases(input.limit_release);
-        (0, main_1.debugPrintf)(`正在处理 listAllReleases.size`, result.length);
-        result.forEach((id) => {
-            (0, main_1.debugPrintf)(`删除 release.id=${id}`);
-            octokit.repos.deleteRelease({ owner, repo, release_id: id });
-        });
-    }
-    return {};
+    return __awaiter(this, void 0, void 0, function* () {
+        if (input.limit_tags > 0) {
+            (0, main_1.debugPrintf)(`正在处理 listAllTags.limit_tags`, input.limit_tags);
+            let result = yield listAllTags(input.limit_tags);
+            (0, main_1.debugPrintf)(`正在处理 listAllTags.size`, result.length);
+            result.forEach((name) => {
+                (0, main_1.debugPrintf)(`删除 tag.name=${name}`);
+                octokit.git.deleteRef({ owner, repo, ref: `tags/${name}` });
+            });
+        }
+        if (input.limit_release > 0) {
+            (0, main_1.debugPrintf)(`正在处理 listAllReleases.limit_release`, input.limit_release);
+            let result = yield listAllReleases(input.limit_release);
+            (0, main_1.debugPrintf)(`正在处理 listAllReleases.size`, result.length);
+            result.forEach((id) => {
+                (0, main_1.debugPrintf)(`删除 release.id=${id}`);
+                octokit.repos.deleteRelease({ owner, repo, release_id: id });
+            });
+        }
+        return {};
+    });
 }
 exports.run = run;
 
@@ -157,7 +172,7 @@ function debugPrintf(...args) {
 }
 exports.debugPrintf = debugPrintf;
 try {
-    handleOutput((0, core_1.run)(getInput()));
+    (0, core_1.run)(getInput()).then(handleOutput);
 }
 catch (error) {
     core.setFailed(error === null || error === void 0 ? void 0 : error.message);
