@@ -33,15 +33,17 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const github = __importStar(__nccwpck_require__(438));
 const main_1 = __nccwpck_require__(109);
-const github_1 = __nccwpck_require__(438);
 const { owner } = github.context.repo;
 const { repo } = github.context.repo;
+const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
 function run(input) {
-    const octokit = (0, github_1.getOctokit)(process.env.GITHUB_TOKEN, {});
-    octokit.repos.listTags({ owner, repo }).then(({ data }) => {
-        let sortData = data.sort((a, b) => (a === null || a === void 0 ? void 0 : a.name) > (b === null || b === void 0 ? void 0 : b.name) ? 1 : -1);
-        (0, main_1.debugPrintf)('github.context', data, sortData);
-    });
+    let page = 2;
+    if (input.limit_tags > 0) {
+        octokit.repos.listTags({ owner, repo, page, per_page: input.limit_tags }).then(({ data }) => {
+            // let sortData = data.sort((a, b) => a?.name > b?.name ? 1 : -1);
+            (0, main_1.debugPrintf)('github.context', data);
+        });
+    }
     // octokit.repos.delete
     // octokit.repos.deleteRelease({
     //     owner, repo, release_id: dat1.data.id
