@@ -39,16 +39,17 @@ const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
 function run(input) {
     let page = 2;
     if (input.limit_tags > 0) {
-        octokit.repos.listTags({ owner, repo, page, per_page: input.limit_tags }).then(({ data }) => {
-            // let sortData = data.sort((a, b) => a?.name > b?.name ? 1 : -1);
-            (0, main_1.debugPrintf)('github.context', data);
-        });
+        let result = [];
+        do {
+            octokit.repos.listTags({ owner, repo, page: page++, per_page: input.limit_tags }).then(({ data }) => {
+                result = data;
+                (0, main_1.debugPrintf)('github.context', data);
+                for (let tag of data) {
+                    octokit.git.deleteRef({ owner, repo, ref: `refs/tags/${tag.name}` });
+                }
+            });
+        } while (result.length >= input.limit_tags);
     }
-    // octokit.repos.delete
-    // octokit.repos.deleteRelease({
-    //     owner, repo, release_id: dat1.data.id
-    // })
-    // let context = github.context;
     return {};
 }
 exports.run = run;
