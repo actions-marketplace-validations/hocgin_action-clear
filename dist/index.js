@@ -37,12 +37,12 @@ const { repo } = github.context.repo;
 const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
 function run(input) {
     if (input.limit_tags > 0) {
-        listAllTags(input.limit_tags).forEach(({ name }) => {
+        listAllTags(input.limit_tags).forEach((name) => {
             octokit.git.deleteRef({ owner, repo, ref: `tags/${name}` });
         });
     }
     if (input.limit_release > 0) {
-        listAllReleases(input.limit_release).forEach(({ id }) => {
+        listAllReleases(input.limit_release).forEach((id) => {
             octokit.repos.deleteRelease({ owner, repo, release_id: id });
         });
     }
@@ -55,7 +55,7 @@ function listAllTags(limit) {
     let perPage = 200;
     do {
         octokit.repos.listTags({ owner, repo, page: page++, per_page: perPage }).then(({ data }) => {
-            result.push(data);
+            result.push(...data.map(({ name }) => name));
         });
     } while (result.length !== perPage);
     return result.slice(Math.min(limit, result.length), result.length);
@@ -66,10 +66,13 @@ function listAllReleases(limit) {
     let perPage = 200;
     do {
         octokit.repos.listReleases({ owner, repo, page: page++, per_page: perPage }).then(({ data }) => {
-            result.push(data);
+            result.push(...data.map(({ id }) => id));
         });
     } while (result.length !== perPage);
     return result.slice(Math.min(limit, result.length), result.length);
+}
+function listAllErrorWorkflowLog(limit) {
+    // octokit.actions.listWorkflowRuns()
 }
 
 
@@ -108,11 +111,12 @@ exports.debugPrintf = void 0;
 const core_1 = __nccwpck_require__(298);
 const core = __importStar(__nccwpck_require__(186));
 let getInput = () => {
-    var _a, _b;
+    var _a, _b, _c;
     return ({
         debug: core.getInput('debug') === 'true',
         limit_tags: parseInt((_a = core.getInput('limit_tags', { required: true })) !== null && _a !== void 0 ? _a : '-1'),
         limit_release: parseInt((_b = core.getInput('limit_release', { required: true })) !== null && _b !== void 0 ? _b : '-1'),
+        limit_err_workflow: parseInt((_c = core.getInput('limit_err_workflow', { required: true })) !== null && _c !== void 0 ? _c : '-1'),
     });
 };
 let handleOutput = (output = {}) => {
