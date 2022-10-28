@@ -32,17 +32,22 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const github = __importStar(__nccwpck_require__(438));
+const main_1 = __nccwpck_require__(109);
 const { owner } = github.context.repo;
 const { repo } = github.context.repo;
 const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
 function run(input) {
     if (input.limit_tags > 0) {
-        listAllTags(input.limit_tags).forEach((name) => {
+        let result = listAllTags(input.limit_tags);
+        result.forEach((name) => {
+            (0, main_1.debugPrintf)(`删除 tag.name=${name}`);
             octokit.git.deleteRef({ owner, repo, ref: `tags/${name}` });
         });
     }
     if (input.limit_release > 0) {
-        listAllReleases(input.limit_release).forEach((id) => {
+        let result = listAllReleases(input.limit_release);
+        result.forEach((id) => {
+            (0, main_1.debugPrintf)(`删除 release.id=${id}`);
             octokit.repos.deleteRelease({ owner, repo, release_id: id });
         });
     }
