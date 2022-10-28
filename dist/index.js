@@ -95,22 +95,32 @@ function listAllReleases(limit, maxLimit = MAX_LIMIT) {
 function run(input) {
     return __awaiter(this, void 0, void 0, function* () {
         if (input.limit_tags > 0) {
-            (0, main_1.debugPrintf)(`正在处理 listAllTags.limit_tags`, input.limit_tags);
-            let result = yield listAllTags(input.limit_tags);
-            (0, main_1.debugPrintf)(`正在处理 listAllTags.size`, result.length);
-            result.forEach((name) => {
-                (0, main_1.debugPrintf)(`删除 tag.name=${name}`);
-                octokit.git.deleteRef({ owner, repo, ref: `tags/${name}` });
-            });
+            try {
+                (0, main_1.debugPrintf)(`正在处理 listAllTags.limit_tags`, input.limit_tags);
+                let result = yield listAllTags(input.limit_tags);
+                (0, main_1.debugPrintf)(`正在处理 listAllTags.size`, result.length);
+                result.forEach((name) => {
+                    (0, main_1.debugPrintf)(`删除 tag.name=${name}`);
+                    octokit.git.deleteRef({ owner, repo, ref: `tags/${name}` });
+                });
+            }
+            catch (e) {
+                console.warn('limit_tags.error', e);
+            }
         }
         if (input.limit_release > 0) {
-            (0, main_1.debugPrintf)(`正在处理 listAllReleases.limit_release`, input.limit_release);
-            let result = yield listAllReleases(input.limit_release);
-            (0, main_1.debugPrintf)(`正在处理 listAllReleases.size`, result.length);
-            result.forEach((id) => {
-                (0, main_1.debugPrintf)(`删除 release.id=${id}`);
-                octokit.repos.deleteRelease({ owner, repo, release_id: id });
-            });
+            try {
+                (0, main_1.debugPrintf)(`正在处理 listAllReleases.limit_release`, input.limit_release);
+                let result = yield listAllReleases(input.limit_release);
+                (0, main_1.debugPrintf)(`正在处理 listAllReleases.size`, result.length);
+                result.forEach((id) => {
+                    (0, main_1.debugPrintf)(`删除 release.id=${id}`);
+                    octokit.repos.deleteRelease({ owner, repo, release_id: id });
+                });
+            }
+            catch (e) {
+                console.warn('limit_release.error', e);
+            }
         }
         return {};
     });
