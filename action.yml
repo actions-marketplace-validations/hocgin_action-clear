@@ -13,7 +13,7 @@ inputs:
     required: false
     default: '-1'
     description: '保留最后 release 数量，-1 全保留'
-  limit_err_workflow:
+  limit_failure_workflow_run:
     required: false
     default: '-1'
     description: '保留最后 workflow 错误日志数量，-1 全保留'
