@@ -10,7 +10,7 @@ const MAX_LIMIT = 2000;
 async function listAllTags(limit: number, maxLimit: number = MAX_LIMIT) {
     let page = 1;
     let result: string[] = [];
-    let perPage = 200;
+    let perPage = 100;
     do {
         debugPrintf(`perPage=${perPage}, page=${page}`);
         let {data} = await octokit.repos.listTags({
@@ -32,7 +32,7 @@ async function listAllTags(limit: number, maxLimit: number = MAX_LIMIT) {
 async function listAllReleases(limit: number, maxLimit: number = MAX_LIMIT) {
     let page = 1;
     let result: number[] = [];
-    let perPage = 200;
+    let perPage = 100;
     do {
         debugPrintf(`perPage=${perPage}, page=${page}`);
         let {data} = await octokit.repos.listReleases({
