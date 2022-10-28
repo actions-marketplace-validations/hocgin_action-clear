@@ -50,7 +50,7 @@ function listAllTags(limit, maxLimit = MAX_LIMIT) {
     return __awaiter(this, void 0, void 0, function* () {
         let page = 1;
         let result = [];
-        let perPage = 200;
+        let perPage = 100;
         do {
             (0, main_1.debugPrintf)(`perPage=${perPage}, page=${page}`);
             let { data } = yield octokit.repos.listTags({
@@ -73,7 +73,7 @@ function listAllReleases(limit, maxLimit = MAX_LIMIT) {
     return __awaiter(this, void 0, void 0, function* () {
         let page = 1;
         let result = [];
-        let perPage = 200;
+        let perPage = 100;
         do {
             (0, main_1.debugPrintf)(`perPage=${perPage}, page=${page}`);
             let { data } = yield octokit.repos.listReleases({
