@@ -32,10 +32,21 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const github = __importStar(__nccwpck_require__(438));
+const main_1 = __nccwpck_require__(109);
+const github_1 = __nccwpck_require__(438);
+const { owner } = github.context.repo;
+const { repo } = github.context.repo;
 function run(input) {
-    // const octokit = getOctokit(process.env.GITHUB_TOKEN!, {});
-    let context = github.context;
-    // TODO 写你的代码..
+    const octokit = (0, github_1.getOctokit)(process.env.GITHUB_TOKEN, {});
+    octokit.repos.listTags({ owner, repo }).then(({ data }) => {
+        let sortData = data.sort((a, b) => (a === null || a === void 0 ? void 0 : a.name) > (b === null || b === void 0 ? void 0 : b.name) ? 1 : -1);
+        (0, main_1.debugPrintf)('github.context', data, sortData);
+    });
+    // octokit.repos.delete
+    // octokit.repos.deleteRelease({
+    //     owner, repo, release_id: dat1.data.id
+    // })
+    // let context = github.context;
     return {};
 }
 exports.run = run;
@@ -75,9 +86,13 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.debugPrintf = void 0;
 const core_1 = __nccwpck_require__(298);
 const core = __importStar(__nccwpck_require__(186));
-let getInput = () => ({
-    debug: core.getInput('debug') === 'true'
-});
+let getInput = () => {
+    var _a;
+    return ({
+        debug: core.getInput('debug') === 'true',
+        limit_tags: parseInt((_a = core.getInput('limit_tags', { required: true })) !== null && _a !== void 0 ? _a : '-1')
+    });
+};
 let handleOutput = (output = {}) => {
     Object.keys(output).forEach((key) => core.setOutput(key, output[key]));
     debugPrintf('输出变量: ', output);
