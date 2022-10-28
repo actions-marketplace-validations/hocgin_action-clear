@@ -42,13 +42,14 @@ function listAllTags(limit, maxLimit = MAX_LIMIT) {
     let result = [];
     let perPage = 40;
     do {
+        (0, main_1.debugPrintf)(`perPage=${perPage}, page=${page}`);
         octokit.repos.listTags({
             owner,
             repo,
             page: page++,
             per_page: perPage
         }).then(({ data = [] }) => {
-            console.log('listAllTags.data', data);
+            (0, main_1.debugPrintf)('listAllTags.data', data);
             result.push(...data.map(({ name }) => name));
         });
     } while (result.length < maxLimit || result.length % perPage !== 0);
@@ -62,13 +63,14 @@ function listAllReleases(limit, maxLimit = MAX_LIMIT) {
     let result = [];
     let perPage = 40;
     do {
+        (0, main_1.debugPrintf)(`perPage=${perPage}, page=${page}`);
         octokit.repos.listReleases({
             owner,
             repo,
             page: page++,
             per_page: perPage
         }).then(({ data }) => {
-            console.log('listReleases.data', data);
+            (0, main_1.debugPrintf)('listReleases.data', data);
             result.push(...data.map(({ id }) => id));
         });
     } while (result.length < maxLimit || result.length % perPage !== 0);
