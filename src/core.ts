@@ -16,7 +16,10 @@ function listAllTags(limit: number, maxLimit: number = 40) {
             page: page++,
             per_page: perPage
         }).then(({data = []}) => result.push(...data.map(({name}) => name)));
-    } while (result.length < maxLimit)
+    } while (result.length < maxLimit || result.length % perPage !== 0)
+    if (limit > result.length) {
+        return [];
+    }
     return result.slice(Math.min(limit, result.length), Math.min(maxLimit, result.length));
 }
 
@@ -31,7 +34,11 @@ function listAllReleases(limit: number, maxLimit: number = 40) {
             page: page++,
             per_page: perPage
         }).then(({data}) => result.push(...data.map(({id}) => id)));
-    } while (result.length < maxLimit)
+    } while (result.length < maxLimit || result.length % perPage !== 0)
+    if (limit > result.length) {
+        return [];
+    }
+
     return result.slice(Math.min(limit, result.length), Math.min(maxLimit, result.length));
 }
 
