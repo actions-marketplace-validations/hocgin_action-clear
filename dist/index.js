@@ -43,16 +43,28 @@ function run(input) {
         do {
             octokit.repos.listTags({ owner, repo, page: page++, per_page: input.limit_tags }).then(({ data }) => {
                 result = data;
-                (0, main_1.debugPrintf)('github.context', data);
-                for (let tag of data) {
+                (0, main_1.debugPrintf)('listTags', result);
+                for (let tag of result) {
                     (0, main_1.debugPrintf)(`delete tag name = ${tag.name}`);
                     octokit.git.deleteRef({ owner, repo, ref: `tags/${tag.name}` });
                 }
             });
-        } while (result.length >= input.limit_tags);
+        } while (result.length !== input.limit_tags);
     }
-    // octokit.git.getTag()
-    // octokit.repos.deleteRelease()
+    page = 2;
+    if (input.limit_release > 0) {
+        let result = [];
+        do {
+            octokit.repos.listReleases({ owner, repo, page: page++, per_page: input.limit_release }).then(({ data }) => {
+                result = data;
+                (0, main_1.debugPrintf)('listReleases', result);
+                for (let release of result) {
+                    (0, main_1.debugPrintf)(`delete release.id = ${release.id}`);
+                    octokit.repos.deleteRelease({ owner, repo, release_id: release.id });
+                }
+            });
+        } while (result.length !== input.limit_release);
+    }
     return {};
 }
 exports.run = run;
@@ -93,10 +105,11 @@ exports.debugPrintf = void 0;
 const core_1 = __nccwpck_require__(298);
 const core = __importStar(__nccwpck_require__(186));
 let getInput = () => {
-    var _a;
+    var _a, _b;
     return ({
         debug: core.getInput('debug') === 'true',
-        limit_tags: parseInt((_a = core.getInput('limit_tags', { required: true })) !== null && _a !== void 0 ? _a : '-1')
+        limit_tags: parseInt((_a = core.getInput('limit_tags', { required: true })) !== null && _a !== void 0 ? _a : '-1'),
+        limit_release: parseInt((_b = core.getInput('limit_release', { required: true })) !== null && _b !== void 0 ? _b : '-1'),
     });
 };
 let handleOutput = (output = {}) => {
