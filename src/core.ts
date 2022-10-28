@@ -54,23 +54,31 @@ async function listAllReleases(limit: number, maxLimit: number = MAX_LIMIT) {
 
 export async function run(input: Inputs) {
     if (input.limit_tags > 0) {
-        debugPrintf(`正在处理 listAllTags.limit_tags`, input.limit_tags)
-        let result = await listAllTags(input.limit_tags);
-        debugPrintf(`正在处理 listAllTags.size`, result.length)
-        result.forEach((name) => {
-            debugPrintf(`删除 tag.name=${name}`)
-            octokit.git.deleteRef({owner, repo, ref: `tags/${name}`});
-        });
+        try {
+            debugPrintf(`正在处理 listAllTags.limit_tags`, input.limit_tags)
+            let result = await listAllTags(input.limit_tags);
+            debugPrintf(`正在处理 listAllTags.size`, result.length)
+            result.forEach((name) => {
+                debugPrintf(`删除 tag.name=${name}`)
+                octokit.git.deleteRef({owner, repo, ref: `tags/${name}`});
+            });
+        } catch (e) {
+            console.warn('limit_tags.error', e);
+        }
     }
 
     if (input.limit_release > 0) {
-        debugPrintf(`正在处理 listAllReleases.limit_release`, input.limit_release)
-        let result = await listAllReleases(input.limit_release);
-        debugPrintf(`正在处理 listAllReleases.size`, result.length)
-        result.forEach((id) => {
-            debugPrintf(`删除 release.id=${id}`)
-            octokit.repos.deleteRelease({owner, repo, release_id: id});
-        });
+        try {
+            debugPrintf(`正在处理 listAllReleases.limit_release`, input.limit_release)
+            let result = await listAllReleases(input.limit_release);
+            debugPrintf(`正在处理 listAllReleases.size`, result.length)
+            result.forEach((id) => {
+                debugPrintf(`删除 release.id=${id}`)
+                octokit.repos.deleteRelease({owner, repo, release_id: id});
+            });
+        } catch (e) {
+            console.warn('limit_release.error', e);
+        }
     }
     return {} as Outputs;
 }
