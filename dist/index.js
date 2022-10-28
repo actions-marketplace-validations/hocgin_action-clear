@@ -108,7 +108,7 @@ function listAllErrorWorkflowRun(limit, maxLimit = MAX_LIMIT) {
                 status: 'failure',
             });
             (0, main_1.debugPrintf)('listAllErrorWorkflowRun.data', data);
-            result.push(...((_a = data.workflow_runs) !== null && _a !== void 0 ? _a : []).map(({ run_number }) => run_number));
+            result.push(...((_a = data.workflow_runs) !== null && _a !== void 0 ? _a : []).map(({ id }) => id));
             // 数量满足 maxLimit，查询发现还有下一页
         } while (result.length < maxLimit && result.length % perPage === 0);
         if (limit > result.length) {
@@ -153,7 +153,7 @@ function run(input) {
             (0, main_1.debugPrintf)(`正在处理 listAllErrorWorkflowRun.size`, result.length);
             result.forEach((run_id) => {
                 (0, main_1.debugPrintf)(`删除 workflow.run_id=${run_id}`);
-                // octokit.actions.deleteWorkflowRun({owner, repo, run_id});
+                octokit.actions.deleteWorkflowRun({ owner, repo, run_id });
             });
         }
         return {};
