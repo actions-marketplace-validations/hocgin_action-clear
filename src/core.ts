@@ -4,15 +4,17 @@ import {getOctokit} from "@actions/github";
 
 const {owner} = github.context.repo;
 const {repo} = github.context.repo;
+const octokit = github.getOctokit(process.env.GITHUB_TOKEN!);
 
 export function run(input: Inputs): Outputs {
-    const octokit = getOctokit(process.env.GITHUB_TOKEN!, {});
+    let page = 2;
+    if (input.limit_tags > 0) {
+        octokit.repos.listTags({owner, repo, page, per_page: input.limit_tags}).then(({data}) => {
+            // let sortData = data.sort((a, b) => a?.name > b?.name ? 1 : -1);
+            debugPrintf('github.context', data);
 
-    octokit.repos.listTags({owner, repo}).then(({data}) => {
-        let sortData = data.sort((a, b) => a?.name > b?.name ? 1 : -1);
-        debugPrintf('github.context', data, sortData);
-
-    });
+        });
+    }
 
 
     // octokit.repos.delete
