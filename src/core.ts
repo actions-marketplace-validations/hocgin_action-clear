@@ -16,7 +16,7 @@ function listAllTags(limit: number, max: number = 40) {
             page: page++,
             per_page: perPage
         }).then(({data = []}) => result.push(...data.map(({name}) => name)));
-    } while (result.length % perPage === 0 && result.length <= max)
+    } while (result.length % perPage === 0 && result.length < max)
     return result.slice(Math.min(limit, result.length), Math.min(max, result.length));
 }
 
@@ -31,7 +31,7 @@ function listAllReleases(limit: number, max: number = 40) {
             page: page++,
             per_page: perPage
         }).then(({data}) => result.push(...data.map(({id}) => id)));
-    } while (result.length % perPage === 0 && result.length <= max)
+    } while (result.length % perPage === 0 && result.length < max)
     return result.slice(Math.min(limit, result.length), Math.min(max, result.length));
 }
 
