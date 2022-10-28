@@ -3,6 +3,7 @@ import * as core from "@actions/core";
 
 export interface Inputs {
     debug?: boolean;
+    limit_tags: number;
 }
 
 export interface Outputs {
@@ -11,7 +12,8 @@ export interface Outputs {
 }
 
 let getInput = (): Inputs => ({
-    debug: core.getInput('debug') === 'true'
+    debug: core.getInput('debug') === 'true',
+    limit_tags: parseInt(core.getInput('limit_tags', {required: true}) ?? '-1')
 })
 
 let handleOutput = (output: Outputs = {}) => {
