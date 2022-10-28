@@ -32,7 +32,7 @@ export function debugPrintf(...args: any) {
 }
 
 try {
-    handleOutput(run(getInput()))
+    run(getInput()).then(handleOutput)
 } catch (error: any) {
     core.setFailed(error?.message);
 }
