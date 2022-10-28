@@ -66,7 +66,7 @@ async function listAllErrorWorkflowRun(limit: number, maxLimit: number = MAX_LIM
             status: 'failure' as any,
         });
         debugPrintf('listAllErrorWorkflowRun.data', data);
-        result.push(...(data.workflow_runs ?? []).map(({run_number}) => run_number));
+        result.push(...(data.workflow_runs ?? []).map(({id}) => id));
         // 数量满足 maxLimit，查询发现还有下一页
     } while (result.length < maxLimit && result.length % perPage === 0)
     if (limit > result.length) {
@@ -110,7 +110,7 @@ export async function run(input: Inputs) {
         debugPrintf(`正在处理 listAllErrorWorkflowRun.size`, result.length)
         result.forEach((run_id) => {
             debugPrintf(`删除 workflow.run_id=${run_id}`)
-            // octokit.actions.deleteWorkflowRun({owner, repo, run_id});
+            octokit.actions.deleteWorkflowRun({owner, repo, run_id});
         });
     }
 
