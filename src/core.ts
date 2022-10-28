@@ -5,7 +5,9 @@ const {owner} = github.context.repo;
 const {repo} = github.context.repo;
 const octokit = github.getOctokit(process.env.GITHUB_TOKEN!);
 
-function listAllTags(limit: number, maxLimit: number = 40) {
+const MAX_LIMIT = 40;
+
+function listAllTags(limit: number, maxLimit: number = MAX_LIMIT) {
     let page = 1;
     let result: string[] = [];
     let perPage = 40;
@@ -15,7 +17,10 @@ function listAllTags(limit: number, maxLimit: number = 40) {
             repo,
             page: page++,
             per_page: perPage
-        }).then(({data = []}) => result.push(...data.map(({name}) => name)));
+        }).then(({data = []}) => {
+            console.log('listAllTags.data', data);
+            result.push(...data.map(({name}) => name));
+        });
     } while (result.length < maxLimit || result.length % perPage !== 0)
     if (limit > result.length) {
         return [];
@@ -23,7 +28,7 @@ function listAllTags(limit: number, maxLimit: number = 40) {
     return result.slice(Math.min(limit, result.length), Math.min(maxLimit, result.length));
 }
 
-function listAllReleases(limit: number, maxLimit: number = 40) {
+function listAllReleases(limit: number, maxLimit: number = MAX_LIMIT) {
     let page = 1;
     let result: number[] = [];
     let perPage = 40;
@@ -33,7 +38,10 @@ function listAllReleases(limit: number, maxLimit: number = 40) {
             repo,
             page: page++,
             per_page: perPage
-        }).then(({data}) => result.push(...data.map(({id}) => id)));
+        }).then(({data}) => {
+            console.log('listReleases.data', data);
+            result.push(...data.map(({id}) => id));
+        });
     } while (result.length < maxLimit || result.length % perPage !== 0)
     if (limit > result.length) {
         return [];
