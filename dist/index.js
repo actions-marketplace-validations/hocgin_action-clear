@@ -92,6 +92,31 @@ function listAllReleases(limit, maxLimit = MAX_LIMIT) {
         return result.slice(Math.min(limit, result.length), Math.min(maxLimit, result.length));
     });
 }
+function listAllErrorWorkflowRun(limit, maxLimit = MAX_LIMIT) {
+    var _a;
+    return __awaiter(this, void 0, void 0, function* () {
+        let page = 1;
+        let result = [];
+        let perPage = 100;
+        do {
+            (0, main_1.debugPrintf)(`perPage=${perPage}, page=${page}`);
+            let { data } = yield octokit.actions.listWorkflowRunsForRepo({
+                owner,
+                repo,
+                page: page++,
+                per_page: perPage,
+                status: 'failure',
+            });
+            (0, main_1.debugPrintf)('listAllErrorWorkflowRun.data', data);
+            result.push(...((_a = data.workflow_runs) !== null && _a !== void 0 ? _a : []).map(({ run_number }) => run_number));
+            // 数量满足 maxLimit，查询发现还有下一页
+        } while (result.length < maxLimit && result.length % perPage === 0);
+        if (limit > result.length) {
+            return [];
+        }
+        return result.slice(Math.min(limit, result.length), Math.min(maxLimit, result.length));
+    });
+}
 function run(input) {
     return __awaiter(this, void 0, void 0, function* () {
         if (input.limit_tags > 0) {
@@ -121,6 +146,15 @@ function run(input) {
             catch (e) {
                 console.warn('limit_release.error', e);
             }
+        }
+        if (input.limit_failure_workflow_run > 0) {
+            (0, main_1.debugPrintf)(`正在处理 listAllErrorWorkflowRun.limit_failure_workflow_run`, input.limit_failure_workflow_run);
+            let result = yield listAllErrorWorkflowRun(input.limit_failure_workflow_run);
+            (0, main_1.debugPrintf)(`正在处理 listAllErrorWorkflowRun.size`, result.length);
+            result.forEach((run_id) => {
+                (0, main_1.debugPrintf)(`删除 workflow.run_id=${run_id}`);
+                // octokit.actions.deleteWorkflowRun({owner, repo, run_id});
+            });
         }
         return {};
     });
@@ -168,7 +202,7 @@ let getInput = () => {
         debug: core.getInput('debug') === 'true',
         limit_tags: parseInt((_a = core.getInput('limit_tags', { required: true })) !== null && _a !== void 0 ? _a : '-1'),
         limit_release: parseInt((_b = core.getInput('limit_release', { required: true })) !== null && _b !== void 0 ? _b : '-1'),
-        limit_err_workflow: parseInt((_c = core.getInput('limit_err_workflow', { required: true })) !== null && _c !== void 0 ? _c : '-1'),
+        limit_failure_workflow_run: parseInt((_c = core.getInput('limit_failure_workflow_run', { required: true })) !== null && _c !== void 0 ? _c : '-1'),
     });
 };
 let handleOutput = (output = {}) => {
