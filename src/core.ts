@@ -25,10 +25,13 @@ function listAllTags(limit: number) {
     let result: string[] = [];
     let perPage = 200;
     do {
-        octokit.repos.listTags({owner, repo, page: page++, per_page: perPage}).then(({data}) => {
-            result.push(...data.map(({name}) => name));
-        });
-    } while (result.length !== perPage)
+        octokit.repos.listTags({
+            owner,
+            repo,
+            page: page++,
+            per_page: perPage
+        }).then(({data}) => result.push(...data.map(({name}) => name)));
+    } while (result.length % perPage === 0)
     return result.slice(Math.min(limit, result.length), result.length);
 }
 
@@ -37,10 +40,13 @@ function listAllReleases(limit: number) {
     let result: number[] = [];
     let perPage = 200;
     do {
-        octokit.repos.listReleases({owner, repo, page: page++, per_page: perPage}).then(({data}) => {
-            result.push(...data.map(({id}) => id));
-        });
-    } while (result.length !== perPage)
+        octokit.repos.listReleases({
+            owner,
+            repo,
+            page: page++,
+            per_page: perPage
+        }).then(({data}) => result.push(...data.map(({id}) => id)));
+    } while (result.length % perPage === 0)
     return result.slice(Math.min(limit, result.length), result.length);
 }
 
