@@ -43,3 +43,7 @@ function listAllReleases(limit: number) {
     } while (result.length !== perPage)
     return result.slice(Math.min(limit, result.length), result.length);
 }
+
+function listAllErrorWorkflowLog(limit: number) {
+    // octokit.actions.listWorkflowRuns()
+}

@@ -1,6 +1,6 @@
-name: 'action-starter'
+name: 'action-clear'
 author: 'hocgin'
-description: '项目描述信息'
+description: '清理项目一些信息(tags/releases)'
 inputs:
   debug:
     required: false
@@ -13,6 +13,10 @@ inputs:
     required: false
     default: '-1'
     description: '保留最后 release 数量，-1 全保留'
+  limit_err_workflow:
+    required: false
+    default: '-1'
+    description: '保留最后 workflow 错误日志数量，-1 全保留'
 #outputs:
 runs:
   using: node16
