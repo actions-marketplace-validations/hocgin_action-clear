@@ -7,13 +7,13 @@ const octokit = github.getOctokit(process.env.GITHUB_TOKEN!);
 
 export function run(input: Inputs): Outputs {
     if (input.limit_tags > 0) {
-        listAllTags(input.limit_tags).forEach(({name}) => {
+        listAllTags(input.limit_tags).forEach((name) => {
             octokit.git.deleteRef({owner, repo, ref: `tags/${name}`});
         });
     }
 
     if (input.limit_release > 0) {
-        listAllReleases(input.limit_release).forEach(({id}) => {
+        listAllReleases(input.limit_release).forEach((id) => {
             octokit.repos.deleteRelease({owner, repo, release_id: id});
         });
     }
@@ -22,11 +22,11 @@ export function run(input: Inputs): Outputs {
 
 function listAllTags(limit: number) {
     let page = 1;
-    let result: any[] = [];
+    let result: string[] = [];
     let perPage = 200;
     do {
         octokit.repos.listTags({owner, repo, page: page++, per_page: perPage}).then(({data}) => {
-            result.push(data);
+            result.push(...data.map(({name}) => name));
         });
     } while (result.length !== perPage)
     return result.slice(Math.min(limit, result.length), result.length);
@@ -34,11 +34,11 @@ function listAllTags(limit: number) {
 
 function listAllReleases(limit: number) {
     let page = 1;
-    let result: any[] = [];
+    let result: number[] = [];
     let perPage = 200;
     do {
         octokit.repos.listReleases({owner, repo, page: page++, per_page: perPage}).then(({data}) => {
-            result.push(data);
+            result.push(...data.map(({id}) => id));
         });
     } while (result.length !== perPage)
     return result.slice(Math.min(limit, result.length), result.length);
