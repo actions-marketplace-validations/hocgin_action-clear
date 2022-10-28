@@ -5,12 +5,12 @@ const {owner} = github.context.repo;
 const {repo} = github.context.repo;
 const octokit = github.getOctokit(process.env.GITHUB_TOKEN!);
 
-const MAX_LIMIT = 40;
+const MAX_LIMIT = 2000;
 
 async function listAllTags(limit: number, maxLimit: number = MAX_LIMIT) {
     let page = 1;
     let result: string[] = [];
-    let perPage = 40;
+    let perPage = 200;
     do {
         debugPrintf(`perPage=${perPage}, page=${page}`);
         let {data} = await octokit.repos.listTags({
@@ -32,7 +32,7 @@ async function listAllTags(limit: number, maxLimit: number = MAX_LIMIT) {
 async function listAllReleases(limit: number, maxLimit: number = MAX_LIMIT) {
     let page = 1;
     let result: number[] = [];
-    let perPage = 40;
+    let perPage = 200;
     do {
         debugPrintf(`perPage=${perPage}, page=${page}`);
         let {data} = await octokit.repos.listReleases({
