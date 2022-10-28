@@ -52,6 +52,29 @@ async function listAllReleases(limit: number, maxLimit: number = MAX_LIMIT) {
     return result.slice(Math.min(limit, result.length), Math.min(maxLimit, result.length));
 }
 
+async function listAllErrorWorkflowRun(limit: number, maxLimit: number = MAX_LIMIT) {
+    let page = 1;
+    let result: number[] = [];
+    let perPage = 100;
+    do {
+        debugPrintf(`perPage=${perPage}, page=${page}`);
+        let {data} = await octokit.actions.listWorkflowRunsForRepo({
+            owner,
+            repo,
+            page: page++,
+            per_page: perPage,
+            status: 'failure' as any,
+        });
+        debugPrintf('listAllErrorWorkflowRun.data', data);
+        result.push(...(data.workflow_runs ?? []).map(({run_number}) => run_number));
+        // 数量满足 maxLimit，查询发现还有下一页
+    } while (result.length < maxLimit && result.length % perPage === 0)
+    if (limit > result.length) {
+        return [];
+    }
+    return result.slice(Math.min(limit, result.length), Math.min(maxLimit, result.length));
+}
+
 export async function run(input: Inputs) {
     if (input.limit_tags > 0) {
         try {
@@ -80,5 +103,16 @@ export async function run(input: Inputs) {
             console.warn('limit_release.error', e);
         }
     }
+
+    if (input.limit_failure_workflow_run > 0) {
+        debugPrintf(`正在处理 listAllErrorWorkflowRun.limit_failure_workflow_run`, input.limit_failure_workflow_run)
+        let result: number[] = await listAllErrorWorkflowRun(input.limit_failure_workflow_run);
+        debugPrintf(`正在处理 listAllErrorWorkflowRun.size`, result.length)
+        result.forEach((run_id) => {
+            debugPrintf(`删除 workflow.run_id=${run_id}`)
+            // octokit.actions.deleteWorkflowRun({owner, repo, run_id});
+        });
+    }
+
     return {} as Outputs;
 }
