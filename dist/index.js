@@ -45,11 +45,14 @@ function run(input) {
                 result = data;
                 (0, main_1.debugPrintf)('github.context', data);
                 for (let tag of data) {
-                    octokit.git.deleteRef({ owner, repo, ref: `refs/tags/${tag.name}` });
+                    (0, main_1.debugPrintf)(`delete tag name = ${tag.name}`);
+                    octokit.git.deleteRef({ owner, repo, ref: `tags/${tag.name}` });
                 }
             });
         } while (result.length >= input.limit_tags);
     }
+    // octokit.git.getTag()
+    // octokit.repos.deleteRelease()
     return {};
 }
 exports.run = run;
