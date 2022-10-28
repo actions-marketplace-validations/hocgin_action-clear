@@ -15,9 +15,11 @@ export function run(input: Inputs): Outputs {
                 result = data;
                 debugPrintf('github.context', data);
                 for (let tag of data) {
-                    octokit.git.deleteRef({owner, repo, ref: `refs/tags/${tag.name}`});
+                    debugPrintf(`delete tag name = ${tag.name}`);
+                    octokit.git.getTag()
+                    octokit.repos.deleteRelease()
+                    octokit.git.deleteRef({owner, repo, ref: `tags/${tag.name}`});
                 }
-
             });
         } while (result.length >= input.limit_tags)
     }
