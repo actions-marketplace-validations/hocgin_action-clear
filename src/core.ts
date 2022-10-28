@@ -13,16 +13,28 @@ export function run(input: Inputs): Outputs {
         do {
             octokit.repos.listTags({owner, repo, page: page++, per_page: input.limit_tags}).then(({data}) => {
                 result = data;
-                debugPrintf('github.context', data);
-                for (let tag of data) {
+                debugPrintf('listTags', result);
+                for (let tag of result) {
                     debugPrintf(`delete tag name = ${tag.name}`);
                     octokit.git.deleteRef({owner, repo, ref: `tags/${tag.name}`});
                 }
             });
-        } while (result.length >= input.limit_tags)
+        } while (result.length !== input.limit_tags)
     }
 
-    // octokit.git.getTag()
-    // octokit.repos.deleteRelease()
+    page = 2;
+    if (input.limit_release > 0) {
+        let result = [];
+        do {
+            octokit.repos.listReleases({owner, repo, page: page++, per_page: input.limit_release}).then(({data}) => {
+                result = data;
+                debugPrintf('listReleases', result);
+                for (let release of result) {
+                    debugPrintf(`delete release.id = ${release.id}`);
+                    octokit.repos.deleteRelease({owner, repo, release_id: release.id});
+                }
+            });
+        } while (result.length !== input.limit_release)
+    }
     return {};
 }
